@@ -1,10 +1,12 @@
 package fr.polytech.cryptoprojet
 
 import fr.polytech.berger.cryptaception.Paillier
+import main.ExtendsPaillier.PaillierExtended
 import java.math.BigInteger
+import kotlin.test.assertEquals
 
 fun main() {
-	val paillier = Paillier.randomCryptaception()
+	val paillier = PaillierExtended.randomCryptaception()
 	val x = /*"Coucou 👋"*/3
 	val y = /*"Bye 🧨"*/5
 	val X = paillier.encrypt(x)
@@ -24,6 +26,11 @@ fun main() {
 	println(paillier.decryptToInt(encrypt).toString() + " = ($x + ${bob.u}) * ($y + ${bob.v})")
 	assert(paillier.decryptToBigInteger(encrypt) == (BigInteger.valueOf(x.toLong()).add(bob.u)).multiply(BigInteger.valueOf(y.toLong()).add(bob.v)))
 	val xy = bob.multi3(alice.paillier, encrypt)
+	println("mult3")
+	val decryptedMult3 = paillier.decryptToInt(xy)
+	println("decrypt of mult3:$decryptedMult3")
+	
+	assertEquals(decryptedMult3,x*y)
 //	println("xy = $xy")
 //	println(paillier.decryptToString(xy))
 }
