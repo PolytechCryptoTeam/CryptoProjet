@@ -26,6 +26,10 @@ class PaillierExtended(_publicKey: BigInteger, _secretKey: BigInteger) : Paillie
 	}
 	
 	fun homomorphicMultiplication(encryptedNumberFirst: BigInteger, plainTextNumberSecond: BigInteger): BigInteger{
-		return encryptedNumberFirst.modPow(plainTextNumberSecond,nSquare);
+		return encryptedNumberFirst.modPow(plainTextNumberSecond,nSquare)
+	}
+	
+	fun homomorphicMultiplication(encryptedNumberFirst: BigInteger, plainTextNumberSecond: Long): BigInteger{
+		return homomorphicMultiplication(encryptedNumberFirst,BigInteger.valueOf(plainTextNumberSecond))
 	}
 }
