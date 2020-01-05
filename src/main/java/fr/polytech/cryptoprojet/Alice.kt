@@ -7,8 +7,8 @@ class Alice(
 	var paillier: Paillier
 ) {
 	
-	fun multi2(resultUxVy: Pair<BigInteger, BigInteger>) : BigInteger {
-		// TODO (r + x)^(s + y)
-		return paillier.encrypt(paillier.decryptToBigInteger(resultUxVy.first).multiply(paillier.decryptToBigInteger(resultUxVy.second)))
+	fun mult2(resultUxVy: Pair<BigInteger, BigInteger>) : BigInteger {
+		// (E(u) * X)^Decrypt(E(v) * Y) (⟺ (u + x) * (v + y))
+		return resultUxVy.first.modPow(paillier.decryptToBigInteger(resultUxVy.second), paillier.publicKey.pow(2))
 	}
 }
