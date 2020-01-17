@@ -8,7 +8,7 @@ class ProtocoleMultiplication(_paillier: Paillier) {
 	
 	/**
 	 * X and Y are encryption of the integer to multipl.
-	 * Return decryption of the product og x and y
+	 * Return encryption of the product og x and y
 	 */
 	fun secureMultiplication(X: BigInteger,Y:BigInteger): BigInteger{
 		val alice = Alice(paillier)
@@ -20,7 +20,7 @@ class ProtocoleMultiplication(_paillier: Paillier) {
 		
 		val XY = bob.mult3(alice.paillier, product)
 		
-		return PaillierStatic.decryptToBigInteger(XY,paillier.publicKey,paillier.secretKey)
+		return XY
 	}
 	
 }

@@ -19,7 +19,8 @@ class ProtocoleMultiplicationTest: Asserter {
         val X= PaillierStatic.encrypt(BigInteger.valueOf(x.toLong()),pk)
         val Y= PaillierStatic.encrypt(BigInteger.valueOf(y.toLong()),pk)
         val protocol = ProtocoleMultiplication(paillier)
-        val xy=protocol.secureMultiplication(X,Y)
+        val XY=protocol.secureMultiplication(X,Y)
+        val xy = PaillierStatic.decryptToBigInteger(XY,paillier.publicKey,paillier.secretKey)
         assertEquals(BigInteger.valueOf(productxy.toLong()),xy)
         
         
