@@ -3,8 +3,7 @@ package fr.polytech.cryptoprojet
 import fr.polytech.berger.cryptaception.Paillier
 import java.math.BigInteger
 
-class ProtocoleMultiplication(_paillier: Paillier) {
-	val paillier=_paillier
+class ProtocoleMultiplication(val paillier: Paillier) {
 	
 	/**
 	 * X and Y are encryption of the integer to multipl.
