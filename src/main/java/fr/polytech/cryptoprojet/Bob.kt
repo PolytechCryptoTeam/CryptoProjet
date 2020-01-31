@@ -22,8 +22,8 @@ class Bob(
 	fun mult1(paillier: Paillier): Pair<BigInteger, BigInteger> {
 		// Choose two scalars u and v randomly
 		while (u == v || u == BigInteger.ZERO || v == BigInteger.ZERO) {
-			u = BigInteger(/*Cryptaception.DEFAULT_KEY_SIZE_BITS*/2, Random()).mod(paillier.publicKey)
-			v = BigInteger(/*Cryptaception.DEFAULT_KEY_SIZE_BITS*/2, Random()).mod(paillier.publicKey)
+			u = BigInteger(Cryptaception.DEFAULT_KEY_SIZE_BITS, Random()).mod(paillier.publicKey)
+			v = BigInteger(Cryptaception.DEFAULT_KEY_SIZE_BITS, Random()).mod(paillier.publicKey)
 		}
 		// E(u) * X, E(v) * Y (⟺ u + x, v + y)
 		return Pair(paillier.encrypt(u).multiply(X), paillier.encrypt(v).multiply(Y))
@@ -41,7 +41,7 @@ class Bob(
 	
 	fun Multi2(n: BigInteger, random: Random = Random()): BigInteger {
 		// e ∈ ℤ/nℤ
-		e = BigInteger.probablePrime(/*Cryptaception.DEFAULT_KEY_SIZE_BITS*/2, random).mod(n)
+		e = BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random).mod(n)
 		return e
 	}
 	
