@@ -39,12 +39,12 @@ class Bob(
 			.multiply(paillier.encrypt(u).modPow(v, paillier.publicKey.pow(2)).modInverse(paillier.publicKey.pow(2)))
 	}
 	
-	fun chooseE(n: BigInteger, random: Random = Random()): BigInteger {
+	fun Multi2(n: BigInteger, random: Random = Random()): BigInteger {
 		e = BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random)
 		return e
 	}
 	
-	fun checkEncryption(ar: Pair<BigInteger, BigInteger>, arPrime: Pair<BigInteger, BigInteger>, n: BigInteger): Boolean {
+	fun Multi4(ar: Pair<BigInteger, BigInteger>, arPrime: Pair<BigInteger, BigInteger>, n: BigInteger): Boolean {
 		val a = ar.first
 		val r = ar.second
 		val aPrime = arPrime.first
@@ -74,7 +74,7 @@ class Bob(
 		
 		return true
 	}
-	fun checkEncryption(result: Pair<Pair<BigInteger, BigInteger>, Pair<BigInteger, BigInteger>>, n: BigInteger): Boolean {
-		return checkEncryption(result.first, result.second, n)
+	fun Multi4(result: Pair<Pair<BigInteger, BigInteger>, Pair<BigInteger, BigInteger>>, n: BigInteger): Boolean {
+		return Multi4(result.first, result.second, n)
 	}
 }

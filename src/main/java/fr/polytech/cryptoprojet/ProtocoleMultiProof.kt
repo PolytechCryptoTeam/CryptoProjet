@@ -8,14 +8,13 @@ class ProtocoleMultiProof(val paillier: Paillier) {
 	
 	fun secureMultiplication(X: BigInteger, Y: BigInteger): BigInteger {
 		val alice = Alice(paillier)
-		alice.chooseMultiProofEncryption()
 		val bob=Bob(X, Y, alice.delta, alice.pi)
 		
 		val pair=bob.mult1(alice.paillier)
 		
 		val product = alice.mult2(pair)
 		
-		alice.chooseMultiProofEncryption()
+		alice.Multi1(pair)
 		
 		// Alice envoie α, β, γ, δ et π à Bob
 		bob.alpha = alice.alpha
@@ -25,11 +24,11 @@ class ProtocoleMultiProof(val paillier: Paillier) {
 		bob.pi = alice.pi
 		
 		// Bob choisit e
-		bob.chooseE(paillier.publicKey)
-		val arAPrimeRPrime = alice.decryptAlphaBetaGamma(bob.e)
+		bob.Multi2(paillier.publicKey)
+		val arAPrimeRPrime = alice.Multi3(bob.e)
 		
 		// Bob vérifie
-		assertTrue(bob.checkEncryption(arAPrimeRPrime, paillier.publicKey))
+		assertTrue(bob.Multi4(arAPrimeRPrime, paillier.publicKey))
 		
 		val XY = bob.mult3(alice.paillier, product)
 		

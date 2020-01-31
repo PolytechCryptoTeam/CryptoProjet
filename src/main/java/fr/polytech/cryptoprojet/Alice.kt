@@ -43,9 +43,15 @@ class Alice(
 		return resultUxVy.first.modPow(paillier.decryptToBigInteger(resultUxVy.second), paillier.publicKey.pow(2))
 	}
 	
-	fun chooseMultiProofEncryption(random: Random = Random()) {
-		_alpha = BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random)
-		_beta = BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random)
+	fun Multi1(resultUxVy: Pair<BigInteger, BigInteger>? = null, random: Random = Random()) {
+		if (resultUxVy == null) {
+			_alpha = BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random)
+			_beta = BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random)
+		}
+		else {
+			_alpha = resultUxVy.first
+			_beta = resultUxVy.second
+		}
 		
 		// γ = α β mod n
 		_gamma = _alpha.multiply(_beta).mod(paillier.publicKey)
@@ -56,7 +62,7 @@ class Alice(
 		_pi = _delta.multiply(_beta).mod(paillier.publicKey)
 	}
 	
-	fun decryptAlphaBetaGamma(e: BigInteger): Pair<Pair<BigInteger, BigInteger>, Pair<BigInteger, BigInteger>> {
+	fun Multi3(e: BigInteger): Pair<Pair<BigInteger, BigInteger>, Pair<BigInteger, BigInteger>> {
 		val nSquared = paillier.publicKey.pow(2)
 		val ar = paillier.decryptPlus(_alpha.modPow(e, nSquared).multiply(_delta).mod(paillier.publicKey.pow(2)))
 		val arPrime = paillier.decryptPlus(_beta.modPow(_alpha, nSquared).multiply(_pi.modInverse(nSquared)).multiply(_gamma.modPow(e.negate(), nSquared)).mod(paillier.publicKey.pow(2)))
