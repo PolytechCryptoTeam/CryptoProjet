@@ -6,7 +6,7 @@ import java.math.BigInteger
 import kotlin.test.Asserter
 import kotlin.test.assertEquals
 
-class ProtocoleMultiplicationTest: Asserter {
+class ProtocoleMultiProofTest: Asserter {
     val paillier= Paillier.randomCryptaception()
     
     @Test
@@ -16,7 +16,7 @@ class ProtocoleMultiplicationTest: Asserter {
         val productxy=x*y
         val X= paillier.encrypt(BigInteger.valueOf(x.toLong()))
         val Y= paillier.encrypt(BigInteger.valueOf(y.toLong()))
-        val protocol = ProtocoleMultiplication(paillier)
+        val protocol = ProtocoleMultiProof(paillier)
         val XY = protocol.secureMultiplication(X,Y)
         val xy = paillier.decryptToBigInteger(XY)
         
