@@ -3,13 +3,13 @@ package fr.polytech.cryptoprojet
 import fr.polytech.berger.cryptaception.Paillier
 import java.math.BigInteger
 
-class ProtocoleMultiplication(val paillier: Paillier) {
+open class ProtocoleMultiplication(val paillier: Paillier) {
 	
 	/**
-	 * X and Y are encryption of the integer to multipl.
-	 * Return encryption of the product og x and y
+	 * X and Y are encryption of the integer to multiply.
+	 * Return encryption of the product of x and y.
 	 */
-	fun secureMultiplication(X: BigInteger,Y:BigInteger): BigInteger{
+	open fun secureMultiplication(X: BigInteger,Y:BigInteger): BigInteger{
 		val alice = Alice(paillier)
 		val bob=Bob(X,Y)
 		

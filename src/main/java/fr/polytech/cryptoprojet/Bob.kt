@@ -22,8 +22,8 @@ class Bob(
 	fun mult1(paillier: Paillier): Pair<BigInteger, BigInteger> {
 		// Choose two scalars u and v randomly
 		while (u == v || u == BigInteger.ZERO || v == BigInteger.ZERO) {
-			u = BigInteger(Cryptaception.DEFAULT_KEY_SIZE_BITS, Random()).mod(paillier.publicKey)
-			v = BigInteger(Cryptaception.DEFAULT_KEY_SIZE_BITS, Random()).mod(paillier.publicKey)
+			u = BigInteger(/*Cryptaception.DEFAULT_KEY_SIZE_BITS*/2, Random()).mod(paillier.publicKey)
+			v = BigInteger(/*Cryptaception.DEFAULT_KEY_SIZE_BITS*/2, Random()).mod(paillier.publicKey)
 		}
 		// E(u) * X, E(v) * Y (⟺ u + x, v + y)
 		return Pair(paillier.encrypt(u).multiply(X), paillier.encrypt(v).multiply(Y))
@@ -40,7 +40,8 @@ class Bob(
 	}
 	
 	fun Multi2(n: BigInteger, random: Random = Random()): BigInteger {
-		e = BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random)
+		// e ∈ ℤ/nℤ
+		e = BigInteger.probablePrime(/*Cryptaception.DEFAULT_KEY_SIZE_BITS*/2, random).mod(n)
 		return e
 	}
 	
@@ -52,25 +53,37 @@ class Bob(
 		val nSquared = n.pow(2)
 		
 		// Check 1
-		val lhs1 = (a.multiply(n).add(BigInteger.ONE)).multiply(r.mod(n))
-		val rhs1 = alpha.modPow(e, nSquared).multiply(delta).mod(nSquared)
+		// (1 + a * n) * rⁿ mod n²
+		val lhs1 = (BigInteger.ONE.add(a.multiply(n))).multiply(r.modPow(n, nSquared))
+		// [α]ᵉ * [δ] mod n²
+		val rhs1 = (alpha.modPow(e, nSquared)).multiply(delta).mod(nSquared)
 		
-		if (rhs1 != lhs1)
+		if (rhs1 != lhs1) {
+			println("Bob.Multi4> Check 1 failed:\n$lhs1 != $rhs1")
 			return false
+		}
 		
 		// Check 2
-		val lhs2 = (aPrime.multiply(n).add(BigInteger.ONE)).multiply(rPrime.mod(n))
-		val rhs2 = beta.modPow(a, nSquared).multiply(pi.modInverse(nSquared)).multiply(gamma.modPow(e.negate(), nSquared)).mod(nSquared)
+		// (1 + a' * n) * r'ⁿ mod n²
+		val lhs2 = (BigInteger.ONE.add(aPrime.multiply(n))).multiply(rPrime.modPow(n, nSquared))
+		// [β]ᵃ * [π]⁻¹ * [γ]⁻ᵉ mod n²
+		val rhs2 = (beta.modPow(a, nSquared)).multiply(pi.modInverse(nSquared)).multiply((gamma.modPow(e, nSquared)).modInverse(nSquared)).mod(nSquared)
 		
-		if (rhs2 != lhs2)
+		if (rhs2 != lhs2) {
+			println("Bob.Multi4> Check 2 failed:\n$lhs2 != $rhs2")
 			return false
+		}
 		
 		// Check 3
+		// a'
 		val lhs3 = aPrime
+		// 0
 		val rhs3 = BigInteger.ZERO
 		
-		if (rhs3 != lhs3)
+		if (rhs3 != lhs3) {
+			println("Bob.Multi4> Check 3 failed:\n$lhs3 != $rhs3")
 			return false
+		}
 		
 		return true
 	}

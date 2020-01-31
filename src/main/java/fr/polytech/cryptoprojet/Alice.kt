@@ -38,34 +38,51 @@ class Alice(
 		return Pair(m, r)
 	}
 	
-	fun mult2(resultUxVy: Pair<BigInteger, BigInteger>) : BigInteger {
-		// (E(u) * X)^Decrypt(E(v) * Y) (⟺ (u + x) * (v + y))
-		return resultUxVy.first.modPow(paillier.decryptToBigInteger(resultUxVy.second), paillier.publicKey.pow(2))
+	/**
+	 * Return (u + x) * (v + y).
+	 * @param resultUxVy Pair containing (u + x) and (v + y).
+	 * @param corruptScenario Alice is not always trustworthy. Put `corruptScenario` to `true`, and the return reuslt
+	 * will be wrong.
+	 */
+	fun mult2(resultUxVy: Pair<BigInteger, BigInteger>, corruptScenario: Boolean = false) : BigInteger {
+		return if (!corruptScenario) {
+			// (E(u) * X)^Decrypt(E(v) * Y) mod n² (⟺ (u + x) * (v + y))
+			resultUxVy.first.modPow(paillier.decryptToBigInteger(resultUxVy.second), paillier.publicKey.pow(2))
+		} else {
+			// (E(u) * X) * (E(v) * Y) mod n² (⟺ (u + x) + (v + y))
+			resultUxVy.first.multiply(resultUxVy.second).mod(paillier.publicKey.pow(2));
+		}
 	}
 	
 	fun Multi1(resultUxVy: Pair<BigInteger, BigInteger>? = null, random: Random = Random()) {
 		if (resultUxVy == null) {
-			_alpha = BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random)
-			_beta = BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random)
+			_alpha = paillier.encrypt(BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random))
+			_beta = paillier.encrypt(BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random))
 		}
 		else {
 			_alpha = resultUxVy.first
 			_beta = resultUxVy.second
 		}
 		
-		// γ = α β mod n
-		_gamma = _alpha.multiply(_beta).mod(paillier.publicKey)
+		// [γ] = [α]^β mod n² ⟺ γ = α β mod n
+		_gamma = _alpha.modPow(paillier.decryptToBigInteger(_beta), paillier.publicKey.pow(2))
+		assert(paillier.decryptToBigInteger(_gamma) == paillier.decryptToBigInteger(_alpha).multiply(paillier.decryptToBigInteger(_beta)).mod(paillier.publicKey))
 		
-		_delta = BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random)
+		// δ ∈ ℤ/nℤ
+		_delta = paillier.encrypt(BigInteger.probablePrime(Cryptaception.DEFAULT_KEY_SIZE_BITS, random)).mod(paillier.publicKey)
 		
-		// π = δ β mod n
-		_pi = _delta.multiply(_beta).mod(paillier.publicKey)
+		// [π] = [δ]^β mod n² ⟺ π = δ β mod n
+		_pi = _delta.modPow(paillier.decryptToBigInteger(_beta), paillier.publicKey.pow(2))
+		assert(paillier.decryptToBigInteger(_pi) == paillier.decryptToBigInteger(_delta).multiply(paillier.decryptToBigInteger(_beta)).mod(paillier.publicKey))
 	}
 	
 	fun Multi3(e: BigInteger): Pair<Pair<BigInteger, BigInteger>, Pair<BigInteger, BigInteger>> {
+		// n²
 		val nSquared = paillier.publicKey.pow(2)
-		val ar = paillier.decryptPlus(_alpha.modPow(e, nSquared).multiply(_delta).mod(paillier.publicKey.pow(2)))
-		val arPrime = paillier.decryptPlus(_beta.modPow(_alpha, nSquared).multiply(_pi.modInverse(nSquared)).multiply(_gamma.modPow(e.negate(), nSquared)).mod(paillier.publicKey.pow(2)))
+		// (a, r) = DecryptPlus([α]ᵉ * [δ] mod n²)
+		val ar = paillier.decryptPlus((_alpha.modPow(e, nSquared)).multiply(_delta).mod(nSquared))
+		// (a', r') = DecryptPlus([β]ᵃ * [π]⁻¹ * [γ]⁻ᵉ mod n²)
+		val arPrime = paillier.decryptPlus((_beta.modPow(ar.first, nSquared)).multiply(_pi.modInverse(nSquared)).multiply((_gamma.modPow(e, nSquared)).modInverse(nSquared)).mod(nSquared))
 		return Pair(ar, arPrime)
 	}
 }
